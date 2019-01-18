@@ -1,0 +1,44 @@
+---
+- name: Create repository {{ borg_repository }}
+  become: yes
+  file:
+    path: "{{ borg_repository }}"
+    state: directory
+  register: repository_created
+
+- name: Create scripts root directory {{ borg_scripts_root }}
+  become: yes
+  file:
+    path: "{{ borg_scripts_root }}"
+    state: directory
+  when: repository_created.changed
+
+- name: Get package 'parallel' for concurrent accesses
+  become: yes
+  block:
+    - apt:
+        name: parallel
+        state: present
+      register: parallel_installed
+    - file:
+        path: /root/.parallel/
+        state: directory
+      when: parallel_installed.changed
+    - file:
+        path: /root/.parallel/will-cite
+        state: touch
+      when: parallel_installed.changed
+  when: repository_created.changed
+
+- name: Get binary v{{ borg_version }}
+  become: yes
+  get_url:
+    url: "{{ borg_binary_url }}"
+    dest: /usr/local/bin/borg
+    mode: +x
+  when: repository_created.changed
+
+- name: Initialize repository {{ borg_repository }}
+  become: yes
+  command: borg init -e {{ borg_encryption }} {{ borg_repository }}
+  when: repository_created.changed

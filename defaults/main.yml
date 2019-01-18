@@ -1,0 +1,23 @@
+---
+borg_version: 1.1.8
+borg_binary_url: https://github.com/borgbackup/borg/releases/download/{{ borg_version }}/borg-linux64
+
+borg_repository: /var/local/borg/backup
+borg_encryption: none
+borg_sem_wait_time: 120
+
+borg_scripts_root: /usr/local/share/borg
+
+borg_archives:
+  - name:
+    paths: []
+    pre_script:
+    post_script:
+    exclude: []
+    prune:
+      minutely:
+      hourly:
+      daily:
+      weekly:
+      monthly:
+      yearly:

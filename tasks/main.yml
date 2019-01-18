@@ -1,0 +1,4 @@
+---
+- import_tasks: install.yml
+- include_tasks: archive.yml
+  loop: "{{ borg_archives }}"
