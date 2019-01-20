@@ -2,8 +2,11 @@
 # Borg backup script for {{ item.name }}
 
 source b-log.sh
-
 LOG_LEVEL_INFO
+
+LOG_FILE={{ borg_log_root }}/{{item.name }}_backup.log
+
+B_LOG --file ${LOG_FILE}
 
 log_or_exit() {
   operation=$1
@@ -42,7 +45,7 @@ backup_{{ item.name }}()
     then
         INFO "Calling pre hook script"
 
-        $PRE_HOOK_SCRIPT_PATH
+        ${PRE_HOOK_SCRIPT_PATH} ${LOG_FILE}
         prehook_exit=$?
         log_or_exit "Pre hook" $prehook_exit
     fi
@@ -81,7 +84,7 @@ backup_{{ item.name }}()
     then
         INFO "Calling post hook script"
 
-        $POST_HOOK_SCRIPT_PATH
+        $POST_HOOK_SCRIPT_PATH ${LOG_FILE}
         post_hook_exit=$?
         log_or_exit "Post hook" $post_hook_exit
     fi

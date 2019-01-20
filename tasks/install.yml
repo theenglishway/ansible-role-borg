@@ -6,12 +6,14 @@
     state: directory
   register: repository_created
 
-- name: Create scripts root directory {{ borg_scripts_root }}
+- name: Create scripts and log directories
   become: yes
   file:
-    path: "{{ borg_scripts_root }}"
+    path: "{{ item }}"
     state: directory
-  when: repository_created.changed
+  loop:
+    - "{{ borg_log_root }}"
+    - "{{ borg_scripts_root }}"
 
 - name: Get package 'parallel' for concurrent accesses
   become: yes

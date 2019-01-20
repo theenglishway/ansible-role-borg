@@ -7,6 +7,7 @@ borg_encryption: none
 borg_sem_wait_time: 120
 
 borg_scripts_root:
+borg_log_root: /var/log/borg
 
 borg_archives:
   - name:

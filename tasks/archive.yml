@@ -5,9 +5,24 @@
 - assert:
     that: "'-' not in item.name"
 
+- name: Prepare facts
+  set_fact:
+    borg_backup_script_path: "{{ borg_scripts_root }}/backup_{{ item.name }}.sh"
+
+- name: Prepare cron
+  set_fact:
+    borg_cron:
+      name: "{{ item.name }}"
+      cron_file: borg_{{ item.name }}
+      job: "{{ borg_backup_script_path }}"
+
 - name: Install borg archive script
   become: yes
   template:
     src: templates/borg-backup.sh
-    dest: "{{ borg_scripts_root }}/backup_{{ item.name }}.sh"
+    dest: "{{ borg_backup_script_path }}"
     mode: +x
+
+- name: Install cronjob
+  become: yes
+  cron: "{{ borg_cron | combine(item.cron) }}"
