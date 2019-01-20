@@ -5,25 +5,9 @@
 - assert:
     that: "'-' not in item.name"
 
-- name: Install pre script {{ item.pre_script }}
-  become: yes
-  template:
-    src: "{{ item.pre_script }}"
-    dest: "{{ borg_scripts_root }}/{{ item.name }}_pre.sh"
-    mode: +x
-  when: item.pre_script
-
-- name: Install post script {{ item.post_script }}
-  become: yes
-  template:
-    src: "{{ item.post_script }}"
-    dest: "{{ borg_scripts_root }}/{{ item.name }}_post.sh"
-    mode: +x
-  when: item.post_script
-
 - name: Install borg archive script
   become: yes
   template:
     src: templates/borg-backup.sh
-    dest: "{{ borg_scripts_root }}/{{ item.name }}_backup.sh"
+    dest: "{{ borg_scripts_root }}/backup_{{ item.name }}.sh"
     mode: +x

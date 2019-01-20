@@ -29,6 +29,8 @@ export BORG_REPO={{ borg_repository }}
 
 # Set prefix to use for the borg archive
 PREFIX={{ ansible_hostname }}_{{ item.name }}
+PRE_HOOK_SCRIPT_PATH={{ borg_scripts_root }}/backup_{{ item.name }}_pre.sh
+POST_HOOK_SCRIPT_PATH={{ borg_scripts_root }}/backup_{{ item.name }}_post.sh
 
 trap 'echo [$LOG_TAG] $( date ) Backup interrupted >&2; exit 2' INT TERM
 
@@ -36,13 +38,14 @@ backup_{{ item.name }}()
 {
     INFO "Starting backup"
 
-    {% if item.pre_script %}
+    if [ -x "$PRE_HOOK_SCRIPT_PATH" ]
+    then
         INFO "Calling pre hook script"
 
-        ./{{ item.name }}_pre.sh
+        $PRE_HOOK_SCRIPT_PATH
         prehook_exit=$?
         log_or_exit "Pre hook" $prehook_exit
-    {% endif %}
+    fi
 
     # Backup the most important directories into an archive named after
     # the machine this script is currently running on:
@@ -74,13 +77,14 @@ backup_{{ item.name }}()
     prune_exit=$?
     log_or_exit "Pruning" $prune_exit
 
-    {% if item.post_script %}
+    if [ -x "$POST_HOOK_SCRIPT_PATH" ]
+    then
         INFO "Calling post hook script"
 
-        ./{{ item.name }}_post.sh
+        $POST_HOOK_SCRIPT_PATH
         post_hook_exit=$?
         log_or_exit "Post hook" $post_hook_exit
-    {% endif %}
+    fi
 
     INFO "Exiting normally"
 }

@@ -6,7 +6,7 @@ borg_repository: /var/local/borg/backup
 borg_encryption: none
 borg_sem_wait_time: 120
 
-borg_scripts_root: /usr/local/share/borg
+borg_scripts_root:
 
 borg_archives:
   - name:
